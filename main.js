@@ -19,35 +19,35 @@ function checkInteger(value) {
  * @param {string} data - stringified JSON array
  */
 function parseArrayAndCheck(column, type, row, data, check) {
-    if (!data) return [];
+	if (!data) return [];
 
-    var result;
+	var result;
 
-    try {
-        result = JSON.parse(data);
-    } catch (e) {
-        throw formatError('Unable to parse JSON array', column, row, data);
-    }
+	try {
+		result = JSON.parse(data);
+	} catch (e) {
+		throw formatError('Unable to parse JSON array', column, row, data);
+	}
 
-    if (!Array.isArray(result)) {
-        throw formatError('Data is not of type array', column, row, data);
-    }
+	if (!Array.isArray(result)) {
+		throw formatError('Data is not of type array', column, row, data);
+	}
 
-    if (type || check) {
+	if (type || check) {
 		for (var i = 0; i < result.length; i++) {
 			var value = result[i];
-            if (type  && typeof value !== type) throw formatError('Not an array of ' + type, column, row, data);
+			if (type  && typeof value !== type) throw formatError('Not an array of ' + type, column, row, data);
 			if (check && check(value) !== true) throw formatError('Array data type is invalid', column, row, data);
-        };
-    }
+		};
+	}
 
-    return result;
+	return result;
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function convertCell(column, type, row, data) {
 	switch (type) {
-        // basic types
+		// basic types
 		case 'string':  return data || '';
 		case 'float':   return parseFloat(data || 0);
 		case 'int':
@@ -55,58 +55,59 @@ function convertCell(column, type, row, data) {
 			if (isNaN(int)) throw formatError('Data is not of type integer', column, row, data);
 			return int;
 		
-        case 'bool':
+		case 'bool':
 			data = data || false;
 			if (!data) return data;
 			if (typeof data === 'boolean') return data;
-            if (data !== 'TRUE' && data !== 'FALSE') throw formatError('Data is not of type boolean', column, row, data);
-            return data === 'TRUE';
-        
-        // arrays
-        case 'array':        return parseArrayAndCheck(column, null,      row, data);
-        case 'array.int':    return parseArrayAndCheck(column, 'number',  row, data, checkInteger);
+			if (data !== 'TRUE' && data !== 'FALSE') throw formatError('Data is not of type boolean', column, row, data);
+			return data === 'TRUE';
+		
+		// arrays
+		case 'array':        return parseArrayAndCheck(column, null,      row, data);
+		case 'array.int':    return parseArrayAndCheck(column, 'number',  row, data, checkInteger);
 		case 'array.float':  return parseArrayAndCheck(column, 'number',  row, data);
 		case 'array.string': return parseArrayAndCheck(column, 'string',  row, data);
 		case 'array.bool':   return parseArrayAndCheck(column, 'boolean', row, data);
 		
-        // json
+		// json
 		case 'json':
-            if (!data) return null;
-            var result;
-            try {
-                result = JSON.parse(data);
-            } catch (e) {
-                throw formatError('Unable to parse JSON', column, row, data);
-            }
-            return result;
+			if (!data) return null;
+			var result;
+			try {
+				result = JSON.parse(data);
+			} catch (e) {
+				throw formatError('Unable to parse JSON', column, row, data);
+			}
+			return result;
 	}
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function unflatten(obj) {
-    var result = {};
+	var result = {};
 
-    for (var key in obj) {
-        // key can be a path "a.b.c"
-        var path = key.split('.');
-        var pointer = result;
-        var last = path.pop();
+	for (var key in obj) {
+		// key can be a path "a.b.c"
+		var path = key.split('.');
+		var pointer = result;
+		var last = path.pop();
 
-        for (var i = 0; i < path.length; i++) {
-            var next = path[i];
-            if (!pointer[next]) pointer[next] = {};
-            pointer = pointer[next];
-        }
+		for (var i = 0; i < path.length; i++) {
+			var next = path[i];
+			if (!pointer[next]) pointer[next] = {};
+			pointer = pointer[next];
+		}
 
-        pointer[last] = obj[key];
-    }
+		pointer[last] = obj[key];
+	}
 
-    return result;
+	return result;
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertSpreadsheetToArray(sheetName, header, typeMap, data) {
-    var result = [];
+function convertSpreadsheetToArray(sheetName, header, data) {
+	var typeMap = data.shift();
+	var result = [];
 
 	for (var i = 0; i < data.length; i++) {
 		var row = {};
@@ -115,13 +116,43 @@ function convertSpreadsheetToArray(sheetName, header, typeMap, data) {
 			row[k] = convertCell(sheetName + ':' + k, typeMap[k], i, data[i][k]);
 		}
 		result.push(unflatten(row));
-    }
+	}
 
 	return result;
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertSpreadsheetToKeyValue(sheetName, data) {
+function convertSpreadsheetToDictionary(sheetName, header, data, keyName, removeKey) {
+	var array = convertSpreadsheetToArray(name, header, data);
+	var result = {};
+
+	for (var i = 0; i < array.length; i++) {
+		var elem = array[i];
+		result[elem[keyName]] = elem;
+		if (removeKey) delete elem[keyName];
+	}
+
+	return result;
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function convertSpreadsheetToMappedList(sheetName, header, data, keyName, removeKey) {
+	var array = convertSpreadsheetToArray(name, header, data);
+	var result = {};
+
+	for (var i = 0; i < array.length; i++) {
+		var elem = array[i];
+		var key = elem[keyName];
+		if (!result[key]) result[key] = [];
+		result[key].push(elem);
+		if (removeKey) delete elem[keyName];
+	}
+
+	return result;
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function convertSpreadsheetToKeyValue(sheetName, header, data) {
 	var result = {};
 
 	for (var i = 0; i < data.length; i++) {
@@ -132,17 +163,14 @@ function convertSpreadsheetToKeyValue(sheetName, data) {
 	return unflatten(result);
 }
 
+
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertArrayToDictionary(array, keyName) {
-    var result = {};
-
-	for (var i = 0; i < array.length; i++) {
-		var elem = array[i];
-		result[elem[keyName]] = elem;
-    }
-
-    return result;
-}
+var CONVERTER_BY_TYPE = {
+	'array':      convertSpreadsheetToArray,
+	'dictionary': convertSpreadsheetToDictionary,
+	'mappedlist': convertSpreadsheetToMappedList,
+	'keyvalue':   convertSpreadsheetToKeyValue
+};
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 /**
@@ -151,13 +179,13 @@ function convertArrayToDictionary(array, keyName) {
  * @param {string} [metaTableName = 'meta'] - Name of the meta data spreadsheet
  */
 function convertWorkbookToJson(workbook, metaTableName) {
-    var result = {};
+	var result = {};
 
-    // get metadata table
-    var metaSheet = workbook.Sheets[metaTableName || 'meta'];
-    var meta = XLSX.utils.sheet_to_json(metaSheet, { raw: true, blankrows: false });
+	// get metadata table
+	var metaSheet = workbook.Sheets[metaTableName || 'meta'];
+	var meta = XLSX.utils.sheet_to_json(metaSheet, { raw: true, blankrows: false });
 
-    // iterate on all spreadsheets defined in meta
+	// iterate on all spreadsheets defined in meta
 	for (var keys = Object.keys(meta), i = 0; i < keys.length; i++) {
 		var def   = meta[i];
 		var name  = def.name;
@@ -173,23 +201,10 @@ function convertWorkbookToJson(workbook, metaTableName) {
 			return !EMPTY_COLUMN_REGEX.test(k);
 		});
 
-        // There are 3 types of spreadsheets: array, dictionary and keyvalue
-		switch (def.format) {
-			case 'array':
-				var typeMap = data.shift();
-                result[name] = convertSpreadsheetToArray(name, header, typeMap, data);
-				break;
-
-			case 'dictionary':
-				var typeMap = data.shift();
-                var content = convertSpreadsheetToArray(name, header, typeMap, data);
-                result[name] = convertArrayToDictionary(content, def.key || 'id');
-				break;
-
-            case 'keyvalue':
-                result[name] = convertSpreadsheetToKeyValue(name, data);
-				break;
-		}
+		var convert = CONVERTER_BY_TYPE[def.format];
+		if (!convert) throw new Error('Incorrect format "' + def.format + '" set for sheet ' + name);
+		var keyName = def.key || 'id';
+		result[name] = convert(name, header, data, keyName);
 	}
 
 	return result;
