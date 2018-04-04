@@ -45,8 +45,9 @@ function parseArrayAndCheck(column, type, row, data, check) {
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertCell(column, type, row, data) {
-	switch (type) {
+function convertCell(sheets, column, type, row, data) {
+	type = type.split(':');
+	switch (type[0]) {
 		// basic types
 		case 'string':  return data || '';
 		case 'float':   return parseFloat(data || 0);
@@ -79,6 +80,15 @@ function convertCell(column, type, row, data) {
 				throw formatError('Unable to parse JSON', column, row, data);
 			}
 			return result;
+
+		// reference
+		case 'ref':
+			var sheetId = type[1];
+			// TODO: if no sheetId defined in type, it could be set in value
+			var sheet = sheets[sheetId];
+			if (!sheet) throw formatError('Sheet='+sheetId+' is not available', column, row, data);
+			// TODO: allow path
+			return sheet[data];
 	}
 }
 
@@ -105,7 +115,7 @@ function unflatten(obj) {
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertSpreadsheetToArray(sheetName, header, data) {
+function convertSpreadsheetToArray(sheets, sheetId, header, data) {
 	var typeMap = data.shift();
 	var result = [];
 
@@ -113,7 +123,7 @@ function convertSpreadsheetToArray(sheetName, header, data) {
 		var row = {};
 		for (var j = 0; j < header.length; j++) {
 			var k = header[j];
-			row[k] = convertCell(sheetName + ':' + k, typeMap[k], i, data[i][k]);
+			row[k] = convertCell(sheets, sheetId + ':' + k, typeMap[k], i, data[i][k]);
 		}
 		result.push(unflatten(row));
 	}
@@ -122,8 +132,8 @@ function convertSpreadsheetToArray(sheetName, header, data) {
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertSpreadsheetToDictionary(sheetName, header, data, keyName, removeKey) {
-	var array = convertSpreadsheetToArray(name, header, data);
+function convertSpreadsheetToDictionary(sheets, sheetId, header, data, keyName, removeKey) {
+	var array = convertSpreadsheetToArray(sheets, sheetId, header, data);
 	var result = {};
 
 	for (var i = 0; i < array.length; i++) {
@@ -136,8 +146,8 @@ function convertSpreadsheetToDictionary(sheetName, header, data, keyName, remove
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertSpreadsheetToMappedList(sheetName, header, data, keyName, removeKey) {
-	var array = convertSpreadsheetToArray(name, header, data);
+function convertSpreadsheetToMappedList(sheets, sheetId, header, data, keyName, removeKey) {
+	var array = convertSpreadsheetToArray(sheets, sheetId, header, data);
 	var result = {};
 
 	for (var i = 0; i < array.length; i++) {
@@ -152,12 +162,12 @@ function convertSpreadsheetToMappedList(sheetName, header, data, keyName, remove
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertSpreadsheetToKeyValue(sheetName, header, data) {
+function convertSpreadsheetToKeyValue(sheets, sheetId, header, data) {
 	var result = {};
 
 	for (var i = 0; i < data.length; i++) {
 		var keyvalue = data[i];
-		result[keyvalue.key] = convertCell(sheetName, keyvalue.type, i, keyvalue.value);
+		result[keyvalue.key] = convertCell(sheets, sheetId, keyvalue.type, i, keyvalue.value);
 	}
 
 	return unflatten(result);
@@ -166,10 +176,12 @@ function convertSpreadsheetToKeyValue(sheetName, header, data) {
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 var CONVERTER_BY_TYPE = {
-	'array':      convertSpreadsheetToArray,
-	'dictionary': convertSpreadsheetToDictionary,
-	'mappedlist': convertSpreadsheetToMappedList,
-	'keyvalue':   convertSpreadsheetToKeyValue
+	'array':       convertSpreadsheetToArray,
+	'dictionary':  convertSpreadsheetToDictionary,
+	'mappedlist':  convertSpreadsheetToMappedList,
+	'keyvalue':    convertSpreadsheetToKeyValue,
+	'dictionary*': function (a, b, c, d, e) { return convertSpreadsheetToDictionary(a, b, c, d, e, true); },
+	'mappedlist*': function (a, b, c, d, e) { return convertSpreadsheetToMappedList(a, b, c, d, e, true); }
 };
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
@@ -179,7 +191,7 @@ var CONVERTER_BY_TYPE = {
  * @param {string} [metaTableName = 'meta'] - Name of the meta data spreadsheet
  */
 function convertWorkbookToJson(workbook, metaTableName) {
-	var result = {};
+	var sheets = {};
 
 	// get metadata table
 	var metaSheet = workbook.Sheets[metaTableName || 'meta'];
@@ -193,7 +205,7 @@ function convertWorkbookToJson(workbook, metaTableName) {
 		var data  = XLSX.utils.sheet_to_json(sheet, { raw: true, blankrows: false });
 
 		if (data.length === 0) {
-			throw new Error('sheetName=' + name + ' does not exist or empty');
+			throw new Error('sheetId=' + name + ' does not exist or empty');
 		}
 
 		// remove columns with empty title
@@ -204,10 +216,10 @@ function convertWorkbookToJson(workbook, metaTableName) {
 		var convert = CONVERTER_BY_TYPE[def.format];
 		if (!convert) throw new Error('Incorrect format "' + def.format + '" set for sheet ' + name);
 		var keyName = def.key || 'id';
-		result[name] = convert(name, header, data, keyName);
+		sheets[name] = convert(sheets, name, header, data, keyName);
 	}
 
-	return result;
+	return sheets;
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
