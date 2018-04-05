@@ -5,6 +5,33 @@ var XLSX   = require('xlsx');
 var EMPTY_COLUMN_REGEX = /__EMPTY.*/;
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function crawl(pointer, path, value) {
+	path += '';
+	var keys = path.split('.');
+	var last = keys.pop();
+
+	for (var i = 0; i < keys.length; i++) {
+		var key = keys[i];
+		if (!pointer[key]) pointer[key] = {};
+		pointer = pointer[key];
+	}
+
+	if (value !== undefined) pointer[last] = value;
+	return pointer[last];
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function unflatten(obj) {
+	var result = {};
+
+	for (var key in obj) {
+		crawl(result, key, obj[key]);
+	}
+
+	return result;
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function formatError(message, column, row, data) {
 	return new Error(message + ' [column= ' + column + ' row= ' + row + ' ] data=' + JSON.stringify(data));
 }
@@ -81,37 +108,26 @@ function convertCell(sheets, column, type, row, data) {
 			}
 			return result;
 
-		// reference
+		// references
 		case 'ref':
 			var sheetId = type[1];
-			// TODO: if no sheetId defined in type, it could be set in value
+			// TODO: if no sheetId defined in type, it could be defined in values
 			var sheet = sheets[sheetId];
 			if (!sheet) throw formatError('Sheet='+sheetId+' is not available', column, row, data);
-			// TODO: allow path
-			return sheet[data];
+			return crawl(sheet, data);
+
+		case 'array.ref':
+			var sheetId = type[1];
+			// TODO: if no sheetId defined in type, it could be defined in values
+			var sheet = sheets[sheetId];
+			if (!sheet) throw formatError('Sheet='+sheetId+' is not available', column, row, data);
+
+			var array = parseArrayAndCheck(column, 'string', row, data);
+			for (var i = 0; i < array.length; i++) {
+				array[i] = crawl(sheet, array[i]);
+			}
+			return array;
 	}
-}
-
-//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function unflatten(obj) {
-	var result = {};
-
-	for (var key in obj) {
-		// key can be a path "a.b.c"
-		var path = key.split('.');
-		var pointer = result;
-		var last = path.pop();
-
-		for (var i = 0; i < path.length; i++) {
-			var next = path[i];
-			if (!pointer[next]) pointer[next] = {};
-			pointer = pointer[next];
-		}
-
-		pointer[last] = obj[key];
-	}
-
-	return result;
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
