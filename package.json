@@ -1,6 +1,6 @@
 {
 	"name": "sync-google-sheet",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Download, read and parse a formatted Google Sheets to JSON object",
 	"main": "main.js",
 	"license": "MIT",
