@@ -1,6 +1,6 @@
 # Sync-Google-Sheet
 
-A simple Node-js library to download Sheet from Google Drive and parse it to JSON.
+A simple Node-js library to download Sheet from Google Drive and parse it to structured JSON.
 
 # Preparation
 
@@ -22,7 +22,7 @@ Google developers console is at this address:
 
 You get a `.json` file that contain a private key to access documents in your Google drive.
 
-Be carrefull with this secret key, don't commit it in your code.
+*(Be carrefull with this secret key, don't commit it in your code!)*
 
 ## Prepare the spreadsheet
 
@@ -53,14 +53,14 @@ You need to specify two things:
 var syncSpreadsheet = require('sync-google-sheet');
 
 var params = {
-	fileId: '1tDyLD2f_P2n9etVESzx-_CJdiH1VgXL8B9VYmEVA6pQ', 
-	clientSecretPath: './keys/google-secret.json',
-	metaTableName: 'meta' // optional
+    fileId: '1tDyLD2f_P2n9etVESzx-_CJdiH1VgXL8B9VYmEVA6pQ', 
+    clientSecretPath: './keys/google-secret.json',
+    metaTableName: 'meta' // optional
 };
 
 syncSpreadsheet(params, function onResult(error, result) {
-	if (error) return console.error(error);
-	console.log(result);
+    if (error) return console.error(error);
+    console.log(result);
 });
 ```
 
@@ -80,6 +80,9 @@ follow:
 available formats are:
  - `array`
  - `dictionary`
+ - `dictionary*`
+ - `mappedList`
+ - `mappedList*`
  - `keyvalue`
 
 The `key` column is only used for dictionary tables, to specify which attribute 
@@ -129,6 +132,64 @@ or the following JSON dictionary with `id` used as key:
 }
 ```
 
+If you want the key to not be included in the dicctionary entries, 
+set the sheet type to `dictionary*` (with an asterisk `*`) in the meta table.
+
+On the same example, the result would become:
+```js
+{
+    bouli: { stats: { atk: 280, def: 430 } },
+    spiky: { stats: { atk: 310, def: 240 } },
+    mekka: { stats: { atk: 120, def: 510 } }
+}
+```
+
+## Mapped List
+
+A mapped list is a dictionary that maps to an array of items.
+
+
+Consider the following table where `id` is used as key. 
+
+| id    | x     | y     | witdh | heigth
+| ----- | ----- | ----- | ----- | ------ 
+| `int`	| `int` | `int` | `int` | `int`
+| 1     | 0     | 0     | 15    | 20
+| 1     | 15    | 2     | 12    | 14
+| 1     | 17    | 1     | 8     | 6
+| 2     | 2     | 13    | 10    | 14
+| 3     | 0     | 0     | 11    | 7
+| 3     | 5     | 3     | 9     | 5
+| 3     | 4     | 8     | 4     | 4
+| 3     | 8     | 5     | 7     | 7
+| 4     | 0     | 0     | 16    | 11
+| 4     | 7     | 2     | 20    | 22
+
+The items that share the same key will be grouped in an array:
+
+```js
+{
+    "1": [
+        { "x": 0,  "y": 0, "witdh": 15, "heigth": 20 },
+        { "x": 15, "y": 2, "witdh": 12, "heigth": 14 },
+        { "x": 17, "y": 1, "witdh": 8,  "heigth": 6 }
+    ],
+    "2": [
+        { "x": 2, "y": 13, "witdh": 10, "heigth": 14 }
+    ],
+    "3": [
+        { "x": 0, "y": 0, "witdh": 11, "heigth": 7 },
+        { "x": 5, "y": 3, "witdh": 9,  "heigth": 5 },
+        { "x": 4, "y": 8, "witdh": 4,  "heigth": 4 },
+        { "x": 8, "y": 5, "witdh": 7,  "heigth": 7 }
+    ],
+    "4": [
+        { "x": 0, "y": 0, "witdh": 16, "heigth": 11 },
+        { "x": 7, "y": 2, "witdh": 20, "heigth": 22 }
+    ]
+}
+```
+
 ## Keyvalue tables
 
 The keyvalue table should define 3 columns:
@@ -163,17 +224,89 @@ will produce the following object:
 
 ## Available types
 
-The following types can be defined to parse the spreadsheet:
- - `int` base 10 integer. Default to `0`.
- - `float` floating point number. Default to `0`.
- - `string` default to the empty string.
- - `bool` default to `false`
+The following types can be defined to tell the script how to parse the values in the spreadsheet.
+If no type is specified, the column (or row when spreadsheet is defined as `keyvalue`) is ignored.
+If a value doesn't match with the type defined, an error is returned in the callback.
+
+### Basic types
+
+ - `int` Base 10 integer. Default to `0`.
+ - `float` Floating point number. Default to `0`.
+ - `string` Text string. Default to the empty string.
+ - `bool` Boolean value. Note that these values are displayed as `TRUE` or `FALSE` in Google Sheet. Default to `false`.
+
+### Arrays
+
  - `array` JSON encoded array. default to an empty array.
  - `array.int` JSON encoded array of integer.
  - `array.float` JSON encoded array of number.
  - `array.string` JSON encoded array of string.
  - `array.bool` JSON encoded array of boolean.
- - `json` any valid JSON object. Default to `null`.
 
-If a value doesn't match with the type defined, an error is returned in the callback.
+### JSON Data
 
+ - `json` string that can be parsed as a valid JSON object. Default to `null`.
+
+
+### References
+
+Reference type let you point data from another sheet that has been extracted 
+(i.e. the sheet needs to be defined in the meta table before where it is referenced).
+You define which sheet (and optionaly wich attribute) to point in the type field itself.
+
+ - `ref:<sheet.path>` single reference
+ - `array.ref:<sheet.path>` array of references.
+
+Consider the following table, in which one field is a reference to the `zone` sheet 
+we previously extracted:
+
+
+| name            | zones       | bgm
+| --------------- | ----------- | --------------- 
+| `string`        | `ref:zone`  | `string`
+| plain           | 1           | wild
+| cave            | 2           | underground
+| mountain        | 3           | wild
+| volcano         | 4           | fire
+
+
+Produce the following JSON object:
+
+```js
+{
+    "plain": {
+        "name": "plain",
+        "zones": [
+            { "x": 0,  "y": 0, "witdh": 15, "heigth": 20 },
+            { "x": 15, "y": 2, "witdh": 12, "heigth": 14 },
+            { "x": 17, "y": 1, "witdh": 8,  "heigth": 6 }
+        ],
+        "bgm": "wild"
+    },
+    "cave": {
+        "name": "cave",
+        "zones": [
+            { "x": 2, "y": 13, "witdh": 10, "heigth": 14 }
+        ],
+        "bgm": "underground"
+    },
+    "mountain": {
+        "name": "mountain",
+        "zones": [
+            { "x": 0, "y": 0, "witdh": 11, "heigth": 7 },
+            { "x": 5, "y": 3, "witdh": 9,  "heigth": 5 },
+            { "x": 4, "y": 8, "witdh": 4,  "heigth": 4 },
+            { "x": 8, "y": 5, "witdh": 7,  "heigth": 7 }
+        ],
+        "bgm": "wild"
+    },
+    "volcano": {
+        "name": "volcano",
+        "zones": [
+            { "x": 0, "y": 0, "witdh": 16, "heigth": 11 },
+            { "x": 7, "y": 2, "witdh": 20, "heigth": 22 }
+        ],
+        "bgm": "fire"
+    }
+}
+```
