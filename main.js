@@ -6,18 +6,19 @@ var EMPTY_COLUMN_REGEX = /__EMPTY.*/;
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function crawl(pointer, path, value) {
-	path += '';
-	var keys = path.split('.');
-	var last = keys.pop();
+	if (!Number.isFinite(path)) {
+		var keys = path.split('.');
+		path = keys.pop();
 
-	for (var i = 0; i < keys.length; i++) {
-		var key = keys[i];
-		if (!pointer[key]) pointer[key] = {};
-		pointer = pointer[key];
+		for (var i = 0; i < keys.length; i++) {
+			var key = keys[i];
+			if (!pointer[key]) pointer[key] = {};
+			pointer = pointer[key];
+		}
 	}
 
-	if (value !== undefined) pointer[last] = value;
-	return pointer[last];
+	if (value !== undefined) pointer[path] = value;
+	return pointer[path];
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
