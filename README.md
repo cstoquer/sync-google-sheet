@@ -151,7 +151,7 @@ A mapped list is a dictionary that maps to an array of items.
 
 Consider the following table where `id` is used as key. 
 
-| id    | x     | y     | witdh | heigth
+| id    | x     | y     | width | height
 | ----- | ----- | ----- | ----- | ------ 
 | `int`	| `int` | `int` | `int` | `int`
 | 1     | 0     | 0     | 15    | 20
@@ -170,22 +170,22 @@ The items that share the same key will be grouped in an array:
 ```js
 {
     "1": [
-        { "x": 0,  "y": 0, "witdh": 15, "heigth": 20 },
-        { "x": 15, "y": 2, "witdh": 12, "heigth": 14 },
-        { "x": 17, "y": 1, "witdh": 8,  "heigth": 6 }
+        { "x": 0,  "y": 0, "width": 15, "height": 20 },
+        { "x": 15, "y": 2, "width": 12, "height": 14 },
+        { "x": 17, "y": 1, "width": 8,  "height": 6 }
     ],
     "2": [
-        { "x": 2, "y": 13, "witdh": 10, "heigth": 14 }
+        { "x": 2, "y": 13, "width": 10, "height": 14 }
     ],
     "3": [
-        { "x": 0, "y": 0, "witdh": 11, "heigth": 7 },
-        { "x": 5, "y": 3, "witdh": 9,  "heigth": 5 },
-        { "x": 4, "y": 8, "witdh": 4,  "heigth": 4 },
-        { "x": 8, "y": 5, "witdh": 7,  "heigth": 7 }
+        { "x": 0, "y": 0, "width": 11, "height": 7 },
+        { "x": 5, "y": 3, "width": 9,  "height": 5 },
+        { "x": 4, "y": 8, "width": 4,  "height": 4 },
+        { "x": 8, "y": 5, "width": 7,  "height": 7 }
     ],
     "4": [
-        { "x": 0, "y": 0, "witdh": 16, "heigth": 11 },
-        { "x": 7, "y": 2, "witdh": 20, "heigth": 22 }
+        { "x": 0, "y": 0, "width": 16, "height": 11 },
+        { "x": 7, "y": 2, "width": 20, "height": 22 }
     ]
 }
 ```
@@ -277,34 +277,34 @@ Produce the following JSON object:
     "plain": {
         "name": "plain",
         "zones": [
-            { "x": 0,  "y": 0, "witdh": 15, "heigth": 20 },
-            { "x": 15, "y": 2, "witdh": 12, "heigth": 14 },
-            { "x": 17, "y": 1, "witdh": 8,  "heigth": 6 }
+            { "x": 0,  "y": 0, "width": 15, "height": 20 },
+            { "x": 15, "y": 2, "width": 12, "height": 14 },
+            { "x": 17, "y": 1, "width": 8,  "height": 6 }
         ],
         "bgm": "wild"
     },
     "cave": {
         "name": "cave",
         "zones": [
-            { "x": 2, "y": 13, "witdh": 10, "heigth": 14 }
+            { "x": 2, "y": 13, "width": 10, "height": 14 }
         ],
         "bgm": "underground"
     },
     "mountain": {
         "name": "mountain",
         "zones": [
-            { "x": 0, "y": 0, "witdh": 11, "heigth": 7 },
-            { "x": 5, "y": 3, "witdh": 9,  "heigth": 5 },
-            { "x": 4, "y": 8, "witdh": 4,  "heigth": 4 },
-            { "x": 8, "y": 5, "witdh": 7,  "heigth": 7 }
+            { "x": 0, "y": 0, "width": 11, "height": 7 },
+            { "x": 5, "y": 3, "width": 9,  "height": 5 },
+            { "x": 4, "y": 8, "width": 4,  "height": 4 },
+            { "x": 8, "y": 5, "width": 7,  "height": 7 }
         ],
         "bgm": "wild"
     },
     "volcano": {
         "name": "volcano",
         "zones": [
-            { "x": 0, "y": 0, "witdh": 16, "heigth": 11 },
-            { "x": 7, "y": 2, "witdh": 20, "heigth": 22 }
+            { "x": 0, "y": 0, "width": 16, "height": 11 },
+            { "x": 7, "y": 2, "width": 20, "height": 22 }
         ],
         "bgm": "fire"
     }
