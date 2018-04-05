@@ -213,6 +213,7 @@ function convertWorkbookToJson(workbook, metaTableName) {
 	// get metadata table
 	var metaSheet = workbook.Sheets[metaTableName || 'meta'];
 	var meta = XLSX.utils.sheet_to_json(metaSheet, { raw: true, blankrows: false });
+	sheets[metaTableName] = meta;
 
 	// iterate on all spreadsheets defined in meta
 	for (var keys = Object.keys(meta), i = 0; i < keys.length; i++) {

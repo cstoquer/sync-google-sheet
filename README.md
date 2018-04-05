@@ -170,22 +170,22 @@ The items that share the same key will be grouped in an array:
 ```js
 {
     "1": [
-        { "x": 0,  "y": 0, "width": 15, "height": 20 },
-        { "x": 15, "y": 2, "width": 12, "height": 14 },
-        { "x": 17, "y": 1, "width": 8,  "height": 6 }
+        { x: 0,  y: 0, width: 15, height: 20 },
+        { x: 15, y: 2, width: 12, height: 14 },
+        { x: 17, y: 1, width: 8,  height: 6 }
     ],
     "2": [
-        { "x": 2, "y": 13, "width": 10, "height": 14 }
+        { x: 2, y: 13, width: 10, height: 14 }
     ],
     "3": [
-        { "x": 0, "y": 0, "width": 11, "height": 7 },
-        { "x": 5, "y": 3, "width": 9,  "height": 5 },
-        { "x": 4, "y": 8, "width": 4,  "height": 4 },
-        { "x": 8, "y": 5, "width": 7,  "height": 7 }
+        { x: 0, y: 0, width: 11, height: 7 },
+        { x: 5, y: 3, width: 9,  height: 5 },
+        { x: 4, y: 8, width: 4,  height: 4 },
+        { x: 8, y: 5, width: 7,  height: 7 }
     ],
     "4": [
-        { "x": 0, "y": 0, "width": 16, "height": 11 },
-        { "x": 7, "y": 2, "width": 20, "height": 22 }
+        { x: 0, y: 0, width: 16, height: 11 },
+        { x: 7, y: 2, width: 20, height: 22 }
     ]
 }
 ```
@@ -274,39 +274,39 @@ Produce the following JSON object:
 
 ```js
 {
-    "plain": {
-        "name": "plain",
-        "zones": [
-            { "x": 0,  "y": 0, "width": 15, "height": 20 },
-            { "x": 15, "y": 2, "width": 12, "height": 14 },
-            { "x": 17, "y": 1, "width": 8,  "height": 6 }
+    plain: {
+        name: "plain",
+        zones: [
+            { x: 0,  y: 0, width: 15, height: 20 },
+            { x: 15, y: 2, width: 12, height: 14 },
+            { x: 17, y: 1, width: 8,  height: 6 }
         ],
-        "bgm": "wild"
+        bgm: "wild"
     },
-    "cave": {
-        "name": "cave",
-        "zones": [
-            { "x": 2, "y": 13, "width": 10, "height": 14 }
+    cave: {
+        name: "cave",
+        zones: [
+            { x: 2, y: 13, width: 10, height: 14 }
         ],
-        "bgm": "underground"
+        bgm: "underground"
     },
-    "mountain": {
-        "name": "mountain",
-        "zones": [
-            { "x": 0, "y": 0, "width": 11, "height": 7 },
-            { "x": 5, "y": 3, "width": 9,  "height": 5 },
-            { "x": 4, "y": 8, "width": 4,  "height": 4 },
-            { "x": 8, "y": 5, "width": 7,  "height": 7 }
+    mountain: {
+        name: "mountain",
+        zones: [
+            { x: 0, y: 0, width: 11, height: 7 },
+            { x: 5, y: 3, width: 9,  height: 5 },
+            { x: 4, y: 8, width: 4,  height: 4 },
+            { x: 8, y: 5, width: 7,  height: 7 }
         ],
-        "bgm": "wild"
+        bgm: "wild"
     },
-    "volcano": {
-        "name": "volcano",
-        "zones": [
-            { "x": 0, "y": 0, "width": 16, "height": 11 },
-            { "x": 7, "y": 2, "width": 20, "height": 22 }
+    volcano: {
+        name: "volcano",
+        zones: [
+            { x: 0, y: 0, width: 16, height: 11 },
+            { x: 7, y: 2, width: 20, height: 22 }
         ],
-        "bgm": "fire"
+        bgm: "fire"
     }
 }
 ```
