@@ -1,9 +1,13 @@
 {
 	"name": "sync-google-sheet",
-	"version": "0.0.2",
-	"description": "Download, read and parse a formatted Google Sheets to JSON object",
+	"version": "1.0.0",
+	"description": "Download formatted Google Sheet and parse it to a structured JSON",
 	"main": "main.js",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cstoquer/sync-google-sheet.git"
+	},
 	"dependencies": {
 		"googleapis": "26.0.1",
 		"xlsx": "0.12.3"
