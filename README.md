@@ -259,20 +259,48 @@ JSON object:
 ```js
 {
     "Clearwater Harbor": {
-        "The Flour Tower":     {"1": { name: "Leoril"}  },
-        "Valenstrong Mansion": {"1": { name: "Viccoril"} },
-        "Shipwreck Edge":      {"1": { name: "Panneak"},  "2": { name: "Jamcoril"} },
-        "The Smelt Belt":      {"1": { name: "Yenqarim"}, "2": { name: "Dorxiron"}, "3": { name: "Alydove"} }
+        "The Flour Tower":     {
+            "1": { name: "Leoril"}
+        },
+        "Valenstrong Mansion": {
+            "1": { name: "Viccoril" }
+        },
+        "Shipwreck Edge":      {
+            "1": { name: "Panneak" },
+            "2": { name: "Jamcoril" }
+        },
+        "The Smelt Belt": {
+            "1": { name: "Yenqarim" },
+            "2": { name: "Dorxiron" },
+            "3": { name: "Alydove" }
+        }
     },
     "Crewth Piers": {
-        "Valor Brewery":  {"1": { name: "Wolgwynn"}, "2": { name: "Oldove"}, "3": { name: "Safrila"} },
-        "Riddlecloud":    {"1": { name: "Colynn"  }, "2": { name: "Kyslynn"} },
-        "Narrow Bridge":  {"1": { name: "Deltheris"} },
-        "Dawnton Castle": {"1": { name: "Aroborin"}, "2": { name: "Sarovar"} }
+        "Valor Brewery":  {
+            "1": { name: "Wolgwynn" },
+            "2": { name: "Oldove" },
+            "3": { name: "Safrila" }
+        },
+        "Riddlecloud":    {
+            "1": { name: "Colynn" },
+            "2": { name: "Kyslynn" }
+        },
+        "Narrow Bridge":  {
+            "1": { name: "Deltheris"}
+        },
+        "Dawnton Castle": {
+            "1": { name: "Aroborin" },
+            "2": { name: "Sarovar" }
+        }
     },
     "Rainbow Ridge Orchard": {
-        "Ert Grotto":         {"1": { name: "Dorfinas"} },
-        "Rivershire Rampart": {"1": { name: "Brennoa"}, "3": { name: "Alyyra"} }
+        "Ert Grotto": {
+            "1": { name: "Dorfinas" }
+        },
+        "Rivershire Rampart": {
+            "1": { name: "Brennoa" },
+            "3": { name: "Alyyra" }
+        }
     }
 }
 ```
