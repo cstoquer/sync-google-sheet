@@ -140,6 +140,7 @@ function convertSpreadsheetToArray(sheets, sheetId, header, data) {
 		var row = {};
 		for (var j = 0; j < header.length; j++) {
 			var k = header[j];
+			if (typeMap[k] === 'ignore') continue;
 			row[k] = convertCell(sheets, sheetId + ':' + k, typeMap[k], i, data[i][k]);
 		}
 		result.push(unflatten(row));

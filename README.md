@@ -85,8 +85,9 @@ available formats are:
  - `mappedList*`
  - `keyvalue`
 
-The `key` column is only used for dictionary tables, to specify which attribute 
+The `key` column is only used for `dictionary` and `mappedlist` tables, to specify which attribute 
 should be used for key. If not specified, `id` is used as key name.
+Keys can be chained (colon separated) to obtain a recursively structured object.
 
 ## Array and dictionary tables
 
@@ -222,20 +223,74 @@ will produce the following object:
 }
 ```
 
-## Available types
+## Recursively structured table and chained keys
+
+To structure `dictionary` or `mappedlist` to more that one depth level, you can chain
+the keys in the meta table by appending them together with a colon character `:`
+
+For instance, given the following table:
+
+| world                  | map                  | id    | name
+| ---------------------- | -------------------- | ----- | ------------ 
+| `string`               | `string`             | `int` | `string`
+| Clearwater Harbor      | The Flour Tower      | 1     | Leoril
+| Clearwater Harbor      | Valenstrong Mansion  | 1     | Viccoril
+| Clearwater Harbor      | Shipwreck Edge       | 1     | Panneak
+| Clearwater Harbor      | Shipwreck Edge       | 2     | Jamcoril
+| Clearwater Harbor      | The Smelt Belt       | 1     | Yenqarim
+| Clearwater Harbor      | The Smelt Belt       | 2     | Dorxiron
+| Clearwater Harbor      | The Smelt Belt       | 3     | Alydove
+| Crewth Piers           | Valor Brewery        | 1     | Wolgwynn
+| Crewth Piers           | Valor Brewery        | 2     | Oldove
+| Crewth Piers           | Valor Brewery        | 3     | Safrila
+| Crewth Piers           | Riddlecloud          | 1     | Colynn
+| Crewth Piers           | Riddlecloud          | 2     | Kyslynn
+| Crewth Piers           | Narrow Bridge        | 1     | Deltheris
+| Crewth Piers           | Dawnton Castle       | 1     | Aroborin
+| Crewth Piers           | Dawnton Castle       | 2     | Sarovar
+| Rainbow Ridge Orchard  | Ert Grotto           | 1     | Dorfinas
+| Rainbow Ridge Orchard  | Rivershire Rampart   | 1     | Brennoa
+| Rainbow Ridge Orchard  | Rivershire Rampart   | 3     | Alyyra
+
+
+By chaining the keys `world:map:id` in the meta table, we obtain the following structured
+JSON object:
+
+```js
+{
+    "Clearwater Harbor": {
+        "The Flour Tower":     {"1": { name: "Leoril"}  },
+        "Valenstrong Mansion": {"1": { name: "Viccoril"} },
+        "Shipwreck Edge":      {"1": { name: "Panneak"},  "2": { name: "Jamcoril"} },
+        "The Smelt Belt":      {"1": { name: "Yenqarim"}, "2": { name: "Dorxiron"}, "3": { name: "Alydove"} }
+    },
+    "Crewth Piers": {
+        "Valor Brewery":  {"1": { name: "Wolgwynn"}, "2": { name: "Oldove"}, "3": { name: "Safrila"} },
+        "Riddlecloud":    {"1": { name: "Colynn"  }, "2": { name: "Kyslynn"} },
+        "Narrow Bridge":  {"1": { name: "Deltheris"} },
+        "Dawnton Castle": {"1": { name: "Aroborin"}, "2": { name: "Sarovar"} }
+    },
+    "Rainbow Ridge Orchard": {
+        "Ert Grotto":         {"1": { name: "Dorfinas"} },
+        "Rivershire Rampart": {"1": { name: "Brennoa"}, "3": { name: "Alyyra"} }
+    }
+}
+```
+
+# Available types
 
 The following types can be defined to tell the script how to parse the values in the spreadsheet.
 If no type is specified, the column (or row when spreadsheet is defined as `keyvalue`) is ignored.
 If a value doesn't match with the type defined, an error is returned in the callback.
 
-### Basic types
+## Basic types
 
  - `int` Base 10 integer. Default to `0`.
  - `float` Floating point number. Default to `0`.
  - `string` Text string. Default to the empty string.
  - `bool` Boolean value. Note that these values are displayed as `TRUE` or `FALSE` in Google Sheet. Default to `false`.
 
-### Arrays
+## Arrays
 
  - `array` JSON encoded array. default to an empty array.
  - `array.int` JSON encoded array of integer.
@@ -243,12 +298,12 @@ If a value doesn't match with the type defined, an error is returned in the call
  - `array.string` JSON encoded array of string.
  - `array.bool` JSON encoded array of boolean.
 
-### JSON Data
+## JSON Data
 
  - `json` string that can be parsed as a valid JSON object. Default to `null`.
 
 
-### References
+## Reference types
 
 Reference type let you point data from another sheet that has been extracted 
 (i.e. the sheet needs to be defined in the meta table before where it is referenced).
