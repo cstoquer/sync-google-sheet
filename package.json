@@ -3,8 +3,9 @@
 	"version": "1.0.2",
 	"description": "Download formatted Google Sheet and parse it to a structured JSON",
 	"author": "Cedric Stoquer",
-	"main": "main.js",
 	"license": "MIT",
+	"main": "main.js",
+	"keywords": ["google", "sheet", "spreadsheet"],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/cstoquer/sync-google-sheet.git"
