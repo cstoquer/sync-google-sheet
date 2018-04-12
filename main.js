@@ -95,11 +95,13 @@ function convertCell(sheets, column, type, row, data) {
 			return data === 'TRUE';
 
 		// arrays
-		case 'array':        return parseArrayAndCheck(column, null,      row, data);
-		case 'array.int':    return parseArrayAndCheck(column, 'number',  row, data, checkInteger);
-		case 'array.float':  return parseArrayAndCheck(column, 'number',  row, data);
-		case 'array.string': return parseArrayAndCheck(column, 'string',  row, data);
-		case 'array.bool':   return parseArrayAndCheck(column, 'boolean', row, data);
+		case 'array':         return parseArrayAndCheck(column, null,      row, data);
+		case 'array.int':
+		case 'array.integer': return parseArrayAndCheck(column, 'number',  row, data, checkInteger);
+		case 'array.float':   return parseArrayAndCheck(column, 'number',  row, data);
+		case 'array.string':  return parseArrayAndCheck(column, 'string',  row, data);
+		case 'array.bool':
+		case 'array.boolean': return parseArrayAndCheck(column, 'boolean', row, data);
 
 		// json
 		case 'json':
