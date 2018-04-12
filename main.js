@@ -77,27 +77,30 @@ function convertCell(sheets, column, type, row, data) {
 	type = type.split(':');
 	switch (type[0]) {
 		// basic types
+		case 'any':     return data;
 		case 'string':  return data === undefined ? '' : data.toString();
 		case 'float':   return parseFloat(data || 0);
 		case 'int':
+		case 'integer':
 			var int = parseInt(data || 0, 10);
 			if (isNaN(int)) throw formatError('Data is not of type integer', column, row, data);
 			return int;
-		
+
 		case 'bool':
+		case 'boolean':
 			data = data || false;
 			if (!data) return data;
 			if (typeof data === 'boolean') return data;
 			if (data !== 'TRUE' && data !== 'FALSE') throw formatError('Data is not of type boolean', column, row, data);
 			return data === 'TRUE';
-		
+
 		// arrays
 		case 'array':        return parseArrayAndCheck(column, null,      row, data);
 		case 'array.int':    return parseArrayAndCheck(column, 'number',  row, data, checkInteger);
 		case 'array.float':  return parseArrayAndCheck(column, 'number',  row, data);
 		case 'array.string': return parseArrayAndCheck(column, 'string',  row, data);
 		case 'array.bool':   return parseArrayAndCheck(column, 'boolean', row, data);
-		
+
 		// json
 		case 'json':
 			if (!data) return null;
@@ -111,6 +114,7 @@ function convertCell(sheets, column, type, row, data) {
 
 		// references
 		case 'ref':
+		case 'reference':
 			var sheetId = type[1];
 			// TODO: if no sheetId defined in type, it could be defined in values
 			var sheet = sheets[sheetId];
@@ -118,6 +122,7 @@ function convertCell(sheets, column, type, row, data) {
 			return crawl(sheet, data);
 
 		case 'array.ref':
+		case 'array.reference':
 			var sheetId = type[1];
 			// TODO: if no sheetId defined in type, it could be defined in values
 			var sheet = sheets[sheetId];
@@ -155,7 +160,7 @@ function convertSpreadsheetToMap(sheets, sheetId, header, data, keyName, isDicti
 	function convertArrayToMap(array, keyNames, keyIndex) {
 		var keyName = keyNames[keyIndex];
 		var result = {};
-		
+
 		for (var i = 0; i < array.length; i++) {
 			var elem = array[i];
 			var key = elem[keyName];
@@ -279,7 +284,7 @@ function downloadGoogleDriveFile(fileId, clientSecretPath, cb) {
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 /**
- * 
+ *
  * @param {Object} params - parameter object
  * @param {string} params.fileId - the ID of the file on Google Drive
  * @param {string} params.clientSecretPath - path to the JSON file that contain the Google secret key
@@ -288,7 +293,7 @@ function downloadGoogleDriveFile(fileId, clientSecretPath, cb) {
  */
 module.exports = function syncSpreadsheet(params, cb) {
 	downloadGoogleDriveFile(params.fileId, params.clientSecretPath, function (error, response) {
-		if (error) return console.error('Could not download the spreadsheet. Check the file ID and its sharing properties.');
+		if (error) return console.error('Could not download the spreadsheet. Check the file ID and its sharing properties.', error);
 
 		var workbook = XLSX.read(response.data, { type: 'buffer' });
 		var result;
