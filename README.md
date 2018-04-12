@@ -53,7 +53,7 @@ You need to specify two things:
 var syncSpreadsheet = require('sync-google-sheet');
 
 var params = {
-    fileId: '1tDyLD2f_P2n9etVESzx-_CJdiH1VgXL8B9VYmEVA6pQ', 
+    fileId: '1tDyLD2f_P2n9etVESzx-_CJdiH1VgXL8B9VYmEVA6pQ',
     clientSecretPath: './keys/google-secret.json',
     metaTableName: 'meta' // optional
 };
@@ -69,12 +69,12 @@ syncSpreadsheet(params, function onResult(error, result) {
 ## Meta table
 
 The workbook should contain one meta table. The meta table define the sheets to export
-and how these sheets should be exported. The format of this meta table is as 
+and how these sheets should be exported. The format of this meta table is as
 follow:
 
-| name          | format        | key   
-| ------------- | ------------- | ----- 
-| SheetName     | dictionary    | id    
+| name          | format        | key
+| ------------- | ------------- | -----
+| SheetName     | dictionary    | id
 
 
 available formats are:
@@ -85,7 +85,7 @@ available formats are:
  - `mappedList*`
  - `keyvalue`
 
-The `key` column is only used for `dictionary` and `mappedlist` tables, to specify which attribute 
+The `key` column is only used for `dictionary` and `mappedlist` tables, to specify which attribute
 should be used for key. If not specified, `id` is used as key name.
 Keys can be chained (colon separated) to obtain a recursively structured object.
 
@@ -96,23 +96,23 @@ The two first row are used to define the attribute name and type.
 The name can be a dot formatted path used to structure the object.
 
 
-| `name`     | <- property name      
-| ---------- | --------------------- 
-| **type**   | <- type of the values 
-| `value`    | <- value for item 1   
-| `value`    | <- value for item 2   
-| `value`    | <- value for item 3   
+| `name`     | <- property name
+| ---------- | ---------------------
+| **type**   | <- type of the values
+| `value`    | <- value for item 1
+| `value`    | <- value for item 2
+| `value`    | <- value for item 3
 
 
 For instance the following table:
 
 
-| id        | stats.atk   | stats.def  
-| --------- | ----------- | ---------- 
-| `string`  | `int`       | `int`  
-| bouli     | 280         | 430        
-| spiky     | 310         | 240        
-| mekka     | 120         | 510        
+| id        | stats.atk   | stats.def
+| --------- | ----------- | ----------
+| `string`  | `int`       | `int`
+| bouli     | 280         | 430
+| spiky     | 310         | 240
+| mekka     | 120         | 510
 
 Will result in the following JSON array:
 
@@ -133,7 +133,7 @@ or the following JSON dictionary with `id` used as key:
 }
 ```
 
-If you want the key to not be included in the dicctionary entries, 
+If you want the key to not be included in the dicctionary entries,
 set the sheet type to `dictionary*` (with an asterisk `*`) in the meta table.
 
 On the same example, the result would become:
@@ -150,10 +150,10 @@ On the same example, the result would become:
 A mapped list is a dictionary that maps to an array of items.
 
 
-Consider the following table where `id` is used as key. 
+Consider the following table where `id` is used as key.
 
 | id    | x     | y     | width | height
-| ----- | ----- | ----- | ----- | ------ 
+| ----- | ----- | ----- | ----- | ------
 | `int`	| `int` | `int` | `int` | `int`
 | 1     | 0     | 0     | 15    | 20
 | 1     | 15    | 2     | 12    | 14
@@ -201,13 +201,13 @@ The keyvalue table should define 3 columns:
 
 For instance, the following table:
 
-| key             | value       | type            
-| --------------- | ----------- | --------------- 
-| player.speed    | 1.4         | `float`       
-| player.power    | 120         | `int`       
-| player.strength | 209         | `int`       
-| area            | "tutorial"  | `string`        
-| entries         | [3, 5, 6]   | `array.int` 
+| key             | value       | type
+| --------------- | ----------- | ---------------
+| player.speed    | 1.4         | `float`
+| player.power    | 120         | `int`
+| player.strength | 209         | `int`
+| area            | "tutorial"  | `string`
+| entries         | [3, 5, 6]   | `array.int`
 
 will produce the following object:
 
@@ -231,7 +231,7 @@ the keys in the meta table by appending them together with a colon character `:`
 For instance, given the following table:
 
 | world                  | map                  | id    | name
-| ---------------------- | -------------------- | ----- | ------------ 
+| ---------------------- | -------------------- | ----- | ------------
 | `string`               | `string`             | `int` | `string`
 | Clearwater Harbor      | The Flour Tower      | 1     | Leoril
 | Clearwater Harbor      | Valenstrong Mansion  | 1     | Viccoril
@@ -333,19 +333,19 @@ If a value doesn't match with the type defined, an error is returned in the call
 
 ## Reference types
 
-Reference type let you point data from another sheet that has been extracted 
+Reference type let you point data from another sheet that has been extracted
 (i.e. the sheet needs to be defined in the meta table before where it is referenced).
 You define which sheet (and optionaly wich attribute) to point in the type field itself.
 
  - `ref:<sheet.path>` single reference
  - `array.ref:<sheet.path>` array of references.
 
-Consider the following table, in which one field is a reference to the `zone` sheet 
+Consider the following table, in which one field is a reference to the `zone` sheet
 we previously extracted:
 
 
 | name            | zones       | bgm
-| --------------- | ----------- | --------------- 
+| --------------- | ----------- | ---------------
 | `string`        | `ref:zone`  | `string`
 | plain           | 1           | wild
 | cave            | 2           | underground
@@ -393,3 +393,7 @@ Produce the following JSON object:
     }
 }
 ```
+
+# Acknowledgements
+
+This tool is based on [grille-downloader](https://github.com/wasedaigo/grille-downloader) and [grille-xlsx](https://github.com/wasedaigo/grille-xlsx) from Daigo Sato.
