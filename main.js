@@ -77,7 +77,7 @@ function convertCell(sheets, column, type, row, data) {
 	type = type.split(':');
 	switch (type[0]) {
 		// basic types
-		case 'string':  return data || '';
+		case 'string':  return data === undefined ? '' : data.toString();
 		case 'float':   return parseFloat(data || 0);
 		case 'int':
 			var int = parseInt(data || 0, 10);
