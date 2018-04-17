@@ -88,6 +88,7 @@ function convertCell(sheets, column, type, row, data) {
 
 		case 'bool':
 		case 'boolean':
+			if (data === undefined) return undefined; // optimize empty cell by removing attribute completely
 			data = data || false;
 			if (!data) return data;
 			if (typeof data === 'boolean') return data;
@@ -117,6 +118,7 @@ function convertCell(sheets, column, type, row, data) {
 		// references
 		case 'ref':
 		case 'reference':
+			if (data === undefined) return undefined;
 			var sheetId = type[1];
 			// TODO: if no sheetId defined in type, it could be defined in values
 			var sheet = sheets[sheetId];
@@ -125,6 +127,7 @@ function convertCell(sheets, column, type, row, data) {
 
 		case 'array.ref':
 		case 'array.reference':
+			if (data === undefined) return undefined;
 			var sheetId = type[1];
 			// TODO: if no sheetId defined in type, it could be defined in values
 			var sheet = sheets[sheetId];
@@ -148,7 +151,8 @@ function convertSpreadsheetToArray(sheets, sheetId, header, data) {
 		for (var j = 0; j < header.length; j++) {
 			var k = header[j];
 			if (typeMap[k] === 'ignore') continue;
-			row[k] = convertCell(sheets, sheetId + ':' + k, typeMap[k], i, data[i][k]);
+			var value = convertCell(sheets, sheetId + ':' + k, typeMap[k], i, data[i][k]);
+			if (value !== undefined) row[k] = value;
 		}
 		result.push(unflatten(row));
 	}
@@ -194,7 +198,8 @@ function convertSpreadsheetToKeyValue(sheets, sheetId, header, data) {
 
 	for (var i = 0; i < data.length; i++) {
 		var keyvalue = data[i];
-		result[keyvalue.key] = convertCell(sheets, sheetId, keyvalue.type, i, keyvalue.value);
+		var value = convertCell(sheets, sheetId, keyvalue.type, i, keyvalue.value);
+		if (value !== undefined) result[keyvalue.key] = value;
 	}
 
 	return unflatten(result);

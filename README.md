@@ -316,7 +316,7 @@ If a value doesn't match with the type defined, an error is returned in the call
  - `int` Base 10 integer. Default to `0`.
  - `float` Floating point number. Default to `0`.
  - `string` Text string. Default to the empty string.
- - `bool` Boolean value. Note that these values are displayed as `TRUE` or `FALSE` in Google Sheet. Default to `false`.
+ - `bool` Boolean value. Note that these values are displayed as `TRUE` or `FALSE` in Google Sheet. If the value is not defined (i.e. empty cell) the attribute is optimized out and removed completely.
 
 ## Arrays
 
@@ -336,6 +336,7 @@ If a value doesn't match with the type defined, an error is returned in the call
 Reference type let you point data from another sheet that has been extracted
 (i.e. the sheet needs to be defined in the meta table before where it is referenced).
 You define which sheet (and optionaly wich attribute) to point in the type field itself.
+Empty cell are optimized out and attribute removed completely.
 
  - `ref:<sheet.path>` single reference
  - `array.ref:<sheet.path>` array of references.
@@ -347,6 +348,7 @@ we previously extracted:
 | name            | zones       | bgm
 | --------------- | ----------- | ---------------
 | `string`        | `ref:zone`  | `string`
+| tuto            |             | wild
 | plain           | 1           | wild
 | cave            | 2           | underground
 | mountain        | 3           | wild
@@ -357,6 +359,7 @@ Produce the following JSON object:
 
 ```js
 {
+    tuto: { name: "tuto", bgm: "wild" },
     plain: {
         name: "plain",
         zones: [
