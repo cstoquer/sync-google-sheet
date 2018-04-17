@@ -107,19 +107,19 @@ The name can be a dot formatted path used to structure the object.
 For instance the following table:
 
 
-| id        | stats.atk   | stats.def
-| --------- | ----------- | ----------
-| `string`  | `int`       | `int`
-| bouli     | 280         | 430
-| spiky     | 310         | 240
-| mekka     | 120         | 510
+| id        | stats.atk   | stats.def  | isBoss
+| --------- | ----------- | ---------- | -----------
+| `string`  | `int`       | `int`      | `bool`
+| bouli     | 280         | 430        | TRUE
+| spiky     | 310         | 240        | FALSE
+| mekka     | 120         | 510        |
 
 Will result in the following JSON array:
 
 ```js
 [
-    { id: 'bouli', stats: { atk: 280, def: 430 } },
-    { id: 'spiky', stats: { atk: 310, def: 240 } },
+    { id: 'bouli', stats: { atk: 280, def: 430 }, isBoss: true },
+    { id: 'spiky', stats: { atk: 310, def: 240 }, isBoss: false },
     { id: 'mekka', stats: { atk: 120, def: 510 } }
 ]
 ```
@@ -127,20 +127,20 @@ Will result in the following JSON array:
 or the following JSON dictionary with `id` used as key:
 ```js
 {
-    bouli: { id: 'bouli', stats: { atk: 280, def: 430 } },
-    spiky: { id: 'spiky', stats: { atk: 310, def: 240 } },
+    bouli: { id: 'bouli', stats: { atk: 280, def: 430 }, isBoss: true },
+    spiky: { id: 'spiky', stats: { atk: 310, def: 240 }, isBoss: false },
     mekka: { id: 'mekka', stats: { atk: 120, def: 510 } }
 }
 ```
 
-If you want the key to not be included in the dicctionary entries,
+If you want the key to not be included in the dictionary entries,
 set the sheet type to `dictionary*` (with an asterisk `*`) in the meta table.
 
 On the same example, the result would become:
 ```js
 {
-    bouli: { stats: { atk: 280, def: 430 } },
-    spiky: { stats: { atk: 310, def: 240 } },
+    bouli: { stats: { atk: 280, def: 430 }, isBoss: true },
+    spiky: { stats: { atk: 310, def: 240 }, isBoss: false },
     mekka: { stats: { atk: 120, def: 510 } }
 }
 ```
