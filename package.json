@@ -1,6 +1,6 @@
 {
 	"name": "sync-google-sheet",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "Download formatted Google Sheet and parse it to a structured JSON",
 	"author": "Cedric Stoquer",
 	"contributors": [
