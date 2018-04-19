@@ -279,7 +279,10 @@ function downloadGoogleDriveFile(fileId, clientSecretPath, cb) {
 		);
 
 		jwtClient.authorize(function onAuthorised(error) {
-			if (error) return cb(error);
+			if (error) {
+				console.error('Could not download the spreadsheet. Check the file ID and its sharing properties.', error);
+				return cb(error);
+			}
 
 			// Exports a Google Drive file to the requested MIME type and returns the exported content.
 			// Note that the exported content is limited to 10MB.
@@ -300,7 +303,7 @@ function downloadGoogleDriveFile(fileId, clientSecretPath, cb) {
  */
 module.exports = function syncSpreadsheet(params, cb) {
 	downloadGoogleDriveFile(params.fileId, params.clientSecretPath, function (error, response) {
-		if (error) return console.error('Could not download the spreadsheet. Check the file ID and its sharing properties.', error);
+		if (error) return cb(error);
 
 		var workbook = XLSX.read(response.data, { type: 'buffer' });
 		var result;
