@@ -328,7 +328,7 @@ If a value doesn't match with the type defined, an error is returned in the call
 
 ## JSON Data
 
- - `json` string that can be parsed as a valid JSON object. Default to `null`.
+ - `json` string that can be parsed as a valid JSON object. If the value is not defined, the attribute gets optimized out.
 
 
 ## Reference types

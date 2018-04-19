@@ -106,7 +106,7 @@ function convertCell(sheets, column, type, row, data) {
 
 		// json
 		case 'json':
-			if (!data) return null;
+			if (!data) return undefined;
 			var result;
 			try {
 				result = JSON.parse(data);
