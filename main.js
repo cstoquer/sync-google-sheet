@@ -3,6 +3,7 @@ var google = require('googleapis').google;
 var XLSX   = require('xlsx');
 
 var EMPTY_COLUMN_REGEX = /__EMPTY.*/;
+var KEY_VALUE_REGEX = /^value\:(.*)$/;
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function crawl(pointer, path, value) {
@@ -194,15 +195,40 @@ function convertSpreadsheetToMap(sheets, sheetId, header, data, keyName, isDicti
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function convertSpreadsheetToKeyValue(sheets, sheetId, header, data) {
-	var result = {};
-
-	for (var i = 0; i < data.length; i++) {
-		var keyvalue = data[i];
-		var value = convertCell(sheets, sheetId, keyvalue.type, i, keyvalue.value);
-		if (value !== undefined) result[keyvalue.key] = value;
+	// parse header
+	var values = [];
+	var header = data[0];
+	for (var id in header) {
+		var r = KEY_VALUE_REGEX.exec(id);
+		if (r) values.push(r[1]);
 	}
 
-	return unflatten(result);
+	function parseKeyValue(id) {
+		var result = {};
+
+		for (var i = 0; i < data.length; i++) {
+			var row = data[i];
+			var value = convertCell(sheets, sheetId, row.type, i, row[id]);
+			if (value !== undefined) result[row.key] = value;
+		}
+
+		return unflatten(result);
+	}
+
+	// parse single value table
+	if (!values.length) {
+		return parseKeyValue('value');
+	}
+
+	// parse multiple values table
+	var tables = {};
+
+	for (var i = 0; i < values.length; i++) {
+		var tableId = values[i];
+		tables[tableId] = parseKeyValue('value:' + tableId);
+	}
+
+	return tables;
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
