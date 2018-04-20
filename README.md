@@ -195,19 +195,19 @@ The items that share the same key will be grouped in an array:
 
 The keyvalue table should define 3 columns:
  - key
- - value
  - type
+ - value
 
 
 For instance, the following table:
 
-| key             | value       | type
-| --------------- | ----------- | ---------------
-| player.speed    | 1.4         | `float`
-| player.power    | 120         | `int`
-| player.strength | 209         | `int`
-| area            | "tutorial"  | `string`
-| entries         | [3, 5, 6]   | `array.int`
+| key             | type            | value
+| --------------- | --------------- | -----------
+| player.speed    | `float`         | 1.4
+| player.power    | `int`           | 120
+| player.strength | `int`           | 209
+| area            | `string`        | "tutorial"
+| entries         | `array.int`     | [3, 5, 6]
 
 will produce the following object:
 
@@ -220,6 +220,25 @@ will produce the following object:
     },
     area: 'tutorial',
     entries: [3, 5, 6]
+}
+```
+
+You can define several values column with an identifier.
+Each value column will be extracted as a separate object.
+
+| key             | type            | value:en    | value:fr    | value:ja
+| --------------- | --------------- | ----------- | ----------- | -------------
+| cookie          | string          | Cookie      | Biscuit     | クッキー
+| key             | string          | Key         | Clé         | 鍵
+| gem             | string          | Gem         | Diamant     | 宝石
+
+Will produce the following dictionary:
+
+```js
+{
+    en: { cookie: "Cookie", key: "Key", gem: "Gem" },
+    fr: { cookie: "Biscuit", key: "Clé", gem: "Diamant" },
+    ja: { cookie: "クッキー", key: "鍵", gem: "宝石" }
 }
 ```
 
