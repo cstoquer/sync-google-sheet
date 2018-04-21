@@ -194,7 +194,7 @@ function convertSpreadsheetToMap(sheets, sheetId, header, data, keyName, isDicti
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertSpreadsheetToKeyValue(sheets, sheetId, header, data) {
+function convertSpreadsheetToKeyValue(sheets, sheetId, header, data, keyName) {
 	// parse header
 	var values = [];
 	var header = data[0];
@@ -218,6 +218,12 @@ function convertSpreadsheetToKeyValue(sheets, sheetId, header, data) {
 	// parse single value table
 	if (!values.length) {
 		return parseKeyValue('value');
+	}
+
+	// parse a single value of a multi values table
+	if (keyName) {
+		if (values.indexOf(keyName) === -1) throw new Error('Value id "' + keyName + '" is not defined in keyvalue table ' + sheetId);
+		return parseKeyValue('value:' + keyName);
 	}
 
 	// parse multiple values table
