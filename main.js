@@ -121,7 +121,12 @@ function convertCell(sheets, column, type, row, data) {
 		case 'reference':
 			if (data === undefined) return undefined;
 			var sheetId = type[1];
-			// TODO: if no sheetId defined in type, it could be defined in values
+			if (!sheetId) {
+				// assuming data has the format "sheet:ref"
+				var r = data.split(':');
+				sheetId = r[0];
+				data = r[1];
+			}
 			var sheet = sheets[sheetId];
 			if (!sheet) throw formatError('Sheet='+sheetId+' is not available', column, row, data);
 			return crawl(sheet, data);
@@ -150,10 +155,10 @@ function convertSpreadsheetToArray(sheets, sheetId, header, data) {
 	for (var i = 0; i < data.length; i++) {
 		var row = {};
 		for (var j = 0; j < header.length; j++) {
-			var k = header[j];
-			if (typeMap[k] === 'ignore') continue;
-			var value = convertCell(sheets, sheetId + ':' + k, typeMap[k], i, data[i][k]);
-			if (value !== undefined) row[k] = value;
+			var key = header[j];
+			if (typeMap[key] === 'ignore') continue;
+			var value = convertCell(sheets, sheetId + ':' + key, typeMap[key], i, data[i][key]);
+			if (value !== undefined) row[key] = value;
 		}
 		result.push(unflatten(row));
 	}
@@ -162,7 +167,23 @@ function convertSpreadsheetToArray(sheets, sheetId, header, data) {
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function convertSpreadsheetToArrayValue(sheets, sheetId, header, data, keyName) {
+	keyName = keyName || 'value';
+	var typeMap = data.shift();
+	var type = typeMap[keyName];
+	var result = [];
+
+	for (var i = 0; i < data.length; i++) {
+		var value = convertCell(sheets, sheetId + ':' + keyName, type, i, data[i][keyName]);
+		result.push(value);
+	}
+
+	return result;
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function convertSpreadsheetToMap(sheets, sheetId, header, data, keyName, isDictionary, removeKey) {
+	keyName = keyName || 'id';
 
 	function convertArrayToMap(array, keyNames, keyIndex) {
 		var keyName = keyNames[keyIndex];
@@ -240,6 +261,7 @@ function convertSpreadsheetToKeyValue(sheets, sheetId, header, data, keyName) {
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 var CONVERTER_BY_TYPE = {
 	'array':       convertSpreadsheetToArray,
+	'arrayvalue':  convertSpreadsheetToArrayValue,
 	'keyvalue':    convertSpreadsheetToKeyValue,
 	'dictionary':  function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, true,  false); },
 	'dictionary*': function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, true,  true); },
@@ -279,8 +301,7 @@ function convertWorkbookToJson(workbook, metaTableName) {
 
 		var convert = CONVERTER_BY_TYPE[def.format];
 		if (!convert) throw new Error('Incorrect format "' + def.format + '" set for sheet ' + name);
-		var keyName = def.key || 'id';
-		sheets[name] = convert(sheets, name, header, data, keyName);
+		sheets[name] = convert(sheets, name, header, data, def.key);
 	}
 
 	return sheets;

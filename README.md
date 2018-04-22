@@ -84,6 +84,7 @@ available formats are:
  - `mappedList`
  - `mappedList*`
  - `keyvalue`
+ - `arrayvalue`
 
 The `key` column is only used for `dictionary` and `mappedlist` tables, to specify which attribute
 should be used for key. If not specified, `id` is used as key name.
