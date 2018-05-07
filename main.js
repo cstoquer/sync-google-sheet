@@ -182,7 +182,7 @@ function convertSpreadsheetToArrayValue(sheets, sheetId, header, data, keyName) 
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-function convertSpreadsheetToMap(sheets, sheetId, header, data, keyName, isDictionary, removeKey) {
+function convertSpreadsheetToMap(sheets, sheetId, header, data, keyName, removeKey, postProcess) {
 	keyName = keyName || 'id';
 
 	function convertArrayToMap(array, keyNames, keyIndex) {
@@ -201,9 +201,9 @@ function convertSpreadsheetToMap(sheets, sheetId, header, data, keyName, isDicti
 			for (var id in result) {
 				result[id] = convertArrayToMap(result[id], keyNames, keyIndex);
 			}
-		} else if (isDictionary) {
+		} else if (postProcess) {
 			for (var id in result) {
-				result[id] = result[id][0];
+				result[id] = postProcess(result[id]);
 			}
 		}
 
@@ -259,14 +259,29 @@ function convertSpreadsheetToKeyValue(sheets, sheetId, header, data, keyName) {
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function dataToDictionary(data) {
+	// TODO: throw an error if data.length is more than 1
+	return data[0];
+}
+
+function dataToValueArray(data) {
+	var array = [];
+	for (var i = 0; i < data.length; ++i) {
+		array.push(data[i].value)
+	}
+	return array;
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 var CONVERTER_BY_TYPE = {
 	'array':       convertSpreadsheetToArray,
 	'arrayvalue':  convertSpreadsheetToArrayValue,
 	'keyvalue':    convertSpreadsheetToKeyValue,
-	'dictionary':  function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, true,  false); },
-	'dictionary*': function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, true,  true); },
-	'mappedlist':  function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, false, false); },
-	'mappedlist*': function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, false, true); }
+	'mappedvalue': function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, false, dataToValueArray); },
+	'dictionary':  function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, false, dataToDictionary); },
+	'dictionary*': function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, true,  dataToDictionary); },
+	'mappedlist':  function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, false); },
+	'mappedlist*': function (s, i, h, d, k) { return convertSpreadsheetToMap(s, i, h, d, k, true); }
 };
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
