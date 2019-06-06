@@ -1,6 +1,7 @@
 var fs     = require('fs');
 var google = require('googleapis').google;
 var XLSX   = require('xlsx');
+var EOL    = require('os').EOL;
 
 var EMPTY_COLUMN_REGEX = /__EMPTY.*/;
 var KEY_VALUE_REGEX = /^value\:(.*)$/;
@@ -167,6 +168,32 @@ function convertSpreadsheetToArray(sheets, sheetId, header, data) {
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function convertSpreadsheetToCSV(sheets, sheetId, header, data) {
+	var result = '';
+	var length = header.length;
+	var comma  = length - 1;
+
+	for (var j = 0; j < length; j++) {
+		var key = header[j];
+		result += key;
+		if (j < comma) result += ',';
+	}
+
+	result += EOL;
+
+	for (var i = 0; i < data.length; i++) {
+		for (var j = 0; j < length; j++) {
+			var key = header[j];
+			result += data[i][key];
+			if (j < comma) result += ',';
+		}
+		if (i < data.length - 1) result += EOL;
+	}
+
+	return result;
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function convertSpreadsheetToArrayValue(sheets, sheetId, header, data, keyName) {
 	keyName = keyName || 'value';
 	var typeMap = data.shift();
@@ -274,6 +301,7 @@ function dataToValueArray(data) {
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 var CONVERTER_BY_TYPE = {
+	'csv':         convertSpreadsheetToCSV,
 	'array':       convertSpreadsheetToArray,
 	'arrayvalue':  convertSpreadsheetToArrayValue,
 	'keyvalue':    convertSpreadsheetToKeyValue,
