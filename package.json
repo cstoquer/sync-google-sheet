@@ -1,22 +1,26 @@
 {
 	"name": "sync-google-sheet",
-	"version": "1.5.0",
+	"version": "1.5.1",
 	"description": "Download formatted Google Sheet and parse it to a structured JSON",
 	"author": "Cedric Stoquer",
 	"contributors": [
 		{
-			"name" : "Daigo Sato"
+			"name": "Daigo Sato"
 		}
 	],
 	"license": "MIT",
 	"main": "main.js",
-	"keywords": ["google", "sheet", "spreadsheet"],
+	"keywords": [
+		"google",
+		"sheet",
+		"spreadsheet"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/cstoquer/sync-google-sheet.git"
 	},
 	"dependencies": {
-		"googleapis": "26.0.1",
-		"xlsx": "0.12.3"
+		"googleapis": "40.0.0",
+		"xlsx": "0.14.3"
 	}
 }
