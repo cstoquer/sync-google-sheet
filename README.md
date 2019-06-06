@@ -1,3 +1,5 @@
+[![Install with NPM](https://nodei.co/npm/sync-google-sheet.png?downloads=true&stars=true)](https://nodei.co/npm/sync-google-sheet/)
+
 # Sync-Google-Sheet
 
 A simple Node-js library to download Sheet from Google Drive and parse it to structured JSON.
