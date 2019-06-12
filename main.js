@@ -184,7 +184,9 @@ function convertSpreadsheetToCSV(sheets, sheetId, header, data) {
 	for (var i = 0; i < data.length; i++) {
 		for (var j = 0; j < length; j++) {
 			var key = header[j];
-			result += data[i][key];
+			var cell = data[i][key];
+			if (cell === undefined) cell = '';
+			result += cell;
 			if (j < comma) result += ',';
 		}
 		if (i < data.length - 1) result += EOL;
