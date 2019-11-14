@@ -75,18 +75,43 @@ function parseArrayAndCheck(column, type, row, data, check) {
 }
 
 //▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function parseValueOrArray(sheets, column, type, row, data) {
+	if (typeof data === 'string' && data[0] === '[') {
+		return convertCell(sheets, column, 'array.' + type, row, data);
+	} else {
+		return convertCell(sheets, column, type, row, data);
+	}
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+function parseInteger(data, column, row) {
+	var int = parseInt(data || 0, 10);
+	if (isNaN(int)) throw formatError('Data is not of type integer', column, row, data);
+	return int;
+}
+
+//▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 function convertCell(sheets, column, type, row, data) {
-	type = type.split(':');
+	type = type.split(':'); // for `ref` types
 	switch (type[0]) {
 		// basic types
 		case 'any':     return data;
-		case 'string':  return data === undefined ? '' : data.toString();
+
+		case 'string':  return data === undefined ? ''        : data.toString();
+		case 'string?': return data === undefined ? undefined : data.toString();
+		case 'string*': return data === undefined ? undefined : parseValueOrArray(sheet, column, 'string', row, data);
+		case 'string+': return data === undefined ? ''        : parseValueOrArray(sheet, column, 'string', row, data);
+
 		case 'float':   return parseFloat(data || 0);
+		case 'float?':  return data === undefined ? undefined : parseFloat(data || 0);
+		case 'float*':  return data === undefined ? undefined : parseValueOrArray(sheet, column, 'float', row, data);
+		case 'float+':  return data === undefined ? 0         : parseValueOrArray(sheet, column, 'float', row, data);
+
 		case 'int':
-		case 'integer':
-			var int = parseInt(data || 0, 10);
-			if (isNaN(int)) throw formatError('Data is not of type integer', column, row, data);
-			return int;
+		case 'integer': return parseInteger(data, column, row);
+		case 'int?':    return data === undefined ? undefined : parseInteger(data, column, row);
+		case 'int*':    return data === undefined ? undefined : parseValueOrArray(sheet, column, 'int', row, data);
+		case 'int+':    return data === undefined ? 0         : parseValueOrArray(sheet, column, 'int', row, data);
 
 		case 'bool':
 		case 'boolean':
