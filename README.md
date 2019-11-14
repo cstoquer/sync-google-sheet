@@ -330,11 +330,43 @@ JSON object:
 
 ## Array value
 
-todo
+The `arrayvalue` format is for exporting a single column to an array.
+
+| value
+| -------
+| `string`
+| sword
+| shield
+| ring
+
+
+```js
+["sword", "shield", "ring"]
+```
 
 ## Mapped value
 
-todo
+Mapped value let you extract arrays of values, grouped by a key. The value column needs to be named `value`.
+
+For instance, extrating the following table:
+
+| id       | value
+| -------- | -----------
+| `string` | `int`
+| star     | 9
+| star     | 12
+| star     | 20
+| luna     | 3
+| luna     | 7
+
+Produces the following JSON object:
+
+```js
+{
+    "star": [9, 12, 20],
+    "luna": [3, 7]
+}
+```
 
 # Available types
 
@@ -356,6 +388,13 @@ If a value doesn't match with the type defined, an error is returned in the call
  - `array.float` JSON encoded array of number.
  - `array.string` JSON encoded array of string.
  - `array.bool` JSON encoded array of boolean.
+
+ ## Wildcard symbols
+
+For some of the basic types (`int`, `float` and `string`), the following wildcard symbols are available:
+ - `?` if the cell is empty, don't add the attribute (no default value)
+ - `+` allow the value to be an array of this type.
+ - `*` allow the value to be empty or an array.
 
 ## JSON Data
 
