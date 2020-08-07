@@ -355,11 +355,11 @@ function convertWorkbookToJson(workbook, metaTableName) {
 
 	// iterate on all spreadsheets defined in meta
 	for (var keys = Object.keys(meta), i = 0; i < keys.length; i++) {
-		var def   = meta[i];
-		var name  = def.name;
-		var sheet = workbook.Sheets[name];
-		var range = def.headerLine ? def.headerLine - 1 : 0;
-		var data  = XLSX.utils.sheet_to_json(sheet, { raw: true, blankrows: false, range: range });
+		var def        = meta[i];
+		var name       = def.name;
+		var sheet      = workbook.Sheets[name];
+		var headerLine = def.headerLine || 1;
+		var data       = XLSX.utils.sheet_to_json(sheet, { raw: true, blankrows: false, range: headerLine - 1 });
 
 		if (data.length === 0) {
 			throw new Error('sheetId=' + name + ' does not exist or empty');
