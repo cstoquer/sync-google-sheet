@@ -358,7 +358,8 @@ function convertWorkbookToJson(workbook, metaTableName) {
 		var def   = meta[i];
 		var name  = def.name;
 		var sheet = workbook.Sheets[name];
-		var data  = XLSX.utils.sheet_to_json(sheet, { raw: true, blankrows: false });
+		var range = def.headerLine ? def.headerLine - 1 : 0;
+		var data  = XLSX.utils.sheet_to_json(sheet, { raw: true, blankrows: false, range: range });
 
 		if (data.length === 0) {
 			throw new Error('sheetId=' + name + ' does not exist or empty');

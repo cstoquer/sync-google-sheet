@@ -74,9 +74,9 @@ The workbook should contain one meta table. The meta table define the sheets to 
 and how these sheets should be exported. The format of this meta table is as
 follow:
 
-| name          | format        | key
-| ------------- | ------------- | -----
-| SheetName     | dictionary    | id
+| name          | format        | key   | headerLine
+| ------------- | ------------- | ----- | -----------
+| SheetName     | dictionary    | id    | line number
 
 
 available formats are:
@@ -92,6 +92,7 @@ available formats are:
 The `key` column is only used for `dictionary` and `mappedlist` tables, to specify which attribute
 should be used for key. If not specified, `id` is used as key name.
 Keys can be chained (colon separated) to obtain a recursively structured object.
+`headerLine` is optional, set it if your title line is not the first one (eg. `2`).
 
 ## Array and dictionary tables
 
