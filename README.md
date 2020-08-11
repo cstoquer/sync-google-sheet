@@ -92,7 +92,7 @@ available formats are:
 The `key` column is only used for `dictionary` and `mappedlist` tables, to specify which attribute
 should be used for key. If not specified, `id` is used as key name.
 Keys can be chained (colon separated) to obtain a recursively structured object.
-`headerLine` is optional, set it if your title line is not the first one (eg. `2`).
+`headerLine` is optional, set it if your title line is not the first one (e.g. `2`).
 
 ## Array and dictionary tables
 
