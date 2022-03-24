@@ -15,7 +15,12 @@ Google developers console is at this address:
  - From your Google developer account, go to the `Library` menu (left side) and find the Google Sheet API.
  - Activate the API by clicking the `ACTIVATE` button.
 
-## Get a Google secret key
+## Get a Google access Key
+
+The library needs one of the following access keys to download the spreadsheet document:
+- Service Account Key: a JSON file.
+- API Key: Simplier to create and use, but less secure.
+### Service Account Key
 
  - From the same Google developers console, go to the `Credentials` menu.
  - Clic the `Create credentials` dropdown button and select `Service account key`
@@ -25,6 +30,13 @@ Google developers console is at this address:
 You get a `.json` file that contain a private key to access documents in your Google drive.
 
 *(Be carrefull with this secret key, don't commit it in your code!)*
+
+### API Key
+
+- From the developer console, go to the `Credentials` menu.
+- Clic the `Create credentials` dropdown button and select `API key`
+
+Copy and paste the provided string as the `apiKey` parameter. See the ["Usage"](#usage) section below
 
 ## Prepare the spreadsheet
 
@@ -45,11 +57,13 @@ its file id is: `1tDyLD2f_P2n9etVESzx-_CJdiH1VgXL8B9VYmEVA6pQ`
 
 `npm install sync-google-spreadsheet -save`
 
-# Export
+# Usage
 
 You need to specify two things:
  - `fileId` the file id of the Google sheet you want to download
- - `clientSecretPath` the path to the json file that contain your Google secret key.
+ - An access key:
+   - either: `clientSecretPath` the path to the json file that contain your Google secret key.
+   - or: `apiKey` the API key string
 
 ```js
 var syncSpreadsheet = require('sync-google-sheet');
@@ -57,6 +71,7 @@ var syncSpreadsheet = require('sync-google-sheet');
 var params = {
     fileId: '1tDyLD2f_P2n9etVESzx-_CJdiH1VgXL8B9VYmEVA6pQ',
     clientSecretPath: './keys/google-secret.json',
+    // apiKey: 'XXxxXxXXX_XXxxxXXXxxxXXXXxxXXxxxXXXX',
     metaTableName: 'meta' // optional
 };
 
@@ -92,6 +107,7 @@ available formats are:
 The `key` column is only used for `dictionary` and `mappedlist` tables, to specify which attribute
 should be used for key. If not specified, `id` is used as key name.
 Keys can be chained (colon separated) to obtain a recursively structured object.
+
 `headerLine` is optional, set it if your title line is not the first one (e.g. `2`).
 
 ## Array and dictionary tables
